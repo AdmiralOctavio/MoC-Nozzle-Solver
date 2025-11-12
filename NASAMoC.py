@@ -24,6 +24,7 @@ n_max = int(1/2 * v_e / dv + 1)
 L = Param.L #theoretical throat radius in mm
 L_combustion = Param.L_combustion #mm
 D_combustion = Param.D_combustion #mm
+SP = Param.Shorten_Percentage
 
 class GridField:
     def __init__(self, k_max, n_max):
@@ -180,6 +181,12 @@ for NII in range(1, int(n_max) + 1):
     
     plt.plot(x_line, y_line, color='lightblue', linestyle='--')
 
+split_index = int(len(wall_x) * SP)
+wall_x_truncated = wall_x[split_index:]
+wall_y_truncated = wall_y[split_index:]
+wall_x = wall_x[:split_index]
+wall_y = wall_y[:split_index]
+
 
 
 # Calculating the circular radius near the throat, because I don't like how NASA just has a sharp edge + circular based 
@@ -219,10 +226,12 @@ A = IT.LocalSoS(g, Rs, T_exit)
 A_exit = (wall_y[-1] / 1000)**2 * np.pi
 Ve = A * M_exit_true
 Thrust = mdot * Ve + (P_exit - 101325) * A_exit
+Exit_Angle = np.rad2deg(np.arctan2(wall_y[-1] - wall_y[-2], wall_x[-1] - wall_x[-2]))
 
 print(f"[bold]Output nozzle design specifications:[/bold]")
 print(f"Total length: {wall_x[-1]:.2f} mm")
 print(f"Exit radius: {wall_y[-1]:.2f} mm")
+print(f"Exit Angle: {Exit_Angle:.2f} Degrees")
 print(f"Throat Radius: {y_arc[5]:.2f} mm \n")
 print(f"Theoretical expansion ratio: {(wall_y[-1]**2 / L**2):.2f}")
 print(f"True expansion ratio: {(wall_y[-1]**2 / y_arc[5]**2):.2f}")
