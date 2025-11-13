@@ -28,6 +28,12 @@ L_combustion = Param.L_combustion #mm
 D_combustion = Param.D_combustion #mm
 SP = Param.Shorten_Percentage
 
+fig, ax = plt.subplots(figsize=(12, 6))
+CUSTOM_GRAY_FIG = '#1C1C1C'
+CUSTOM_GRAY_AXES = '#2E2E2E'
+fig.set_facecolor(CUSTOM_GRAY_FIG) 
+ax.set_facecolor(CUSTOM_GRAY_AXES) 
+
 class GridField:
     def __init__(self, k_max, n_max):
         self.k_max = int(k_max)
@@ -157,7 +163,7 @@ for NI in range(1, n_max+1):
         x_kn, y_kn = grid.get_xy(KI, NI)
         x_line.append(x_kn)
         y_line.append(y_kn)
-    plt.plot(x_line, y_line, color='darkgray', linestyle='--')
+    ax.plot(x_line, y_line, color="#CA56FF", linestyle='--', alpha=0.5)
 
 wall_x = []
 wall_y = []
@@ -181,7 +187,7 @@ for NII in range(1, int(n_max) + 1):
             wall_y.append(y_NN)
             
     
-    plt.plot(x_line, y_line, color='lightblue', linestyle='--')
+    ax.plot(x_line, y_line, color="#D02E2E", linestyle='--', alpha=0.5)
 
 split_index = int(len(wall_x) * SP)
 wall_x_truncated = wall_x[split_index:]
@@ -246,18 +252,46 @@ print(f"[cyan]Exit radius: \t \t {wall_y[-1]:.2f} mm[/cyan]")
 if Exit_Angle > 6: print(f"[red]Exit Angle: \t \t {Exit_Angle:.2f} Degrees[/red]")
 else: print(f"[cyan]Exit Angle: \t \t {Exit_Angle:.2f} Degrees[/cyan]")
 print(f"[cyan]True Throat Radius: \t {y_min:.2f} mm \n[/cyan]")
-print(f"Theoretical expansion ratio: \t {(wall_y[-1]**2 / L**2):.2f}")
-print(f"True expansion ratio: \t \t {(wall_y[-1]**2 / y_min**2):.2f}")
-print(f"Design Exit Mach: \t \t {M_exit}")
-print(f"Predicted Exit Mach: \t \t {M_exit_true:.2f}")
-print(f"Predicted Thrust: \t \t {Thrust:.0f} N")
-print(f"Predicted Exit pressure: \t {P_exit:.0f} Pa")
+print(f"[light_green]Theoretical expansion ratio: \t {(wall_y[-1]**2 / L**2):.2f}")
+print(f"[light_green]True expansion ratio: \t \t {(wall_y[-1]**2 / y_min**2):.2f}")
+print(f"[light_green]Design Exit Mach: \t \t {M_exit}")
+print(f"[light_green]Predicted Exit Mach: \t \t {M_exit_true:.2f}")
+print(f"[light_green]Predicted Thrust: \t \t {Thrust:.0f} N")
+print(f"[light_green]Thrust from Massflow: \t \t {mdot * Ve:.2f} N")
+print(f"[light_green]Thrust from Pressure: \t \t {(P_exit - 101325) * A_exit:.2f} N[/light_green]")
+if P_exit < 0.25 * 101325: 
+    print(f"[bold][red]Predicted Exit pressure: \t {P_exit:.0f} Pa")
+    print(f"[bold][red]\nWARNING: Flow separation will be present at the nozzle exit.")
+elif 0.25 * 101325 < P_exit < 0.4 *101325:
+    print(f"[bold][light_salmon3]Predicted Exit pressure: \t {P_exit:.0f} Pa[/light_salmon3][/bold]")
+    print(f"[bold][light_salmon3]\nWARNING: Flow separation may occur at the nozzle exit.[/light_salmon3][/bold]")
+elif 0.4 * 101325 < P_exit < 0.5 * 101325: 
+    print(f"[yellow3][bold]Predicted Exit pressure: \t {P_exit:.0f} Pa")
+    print(f"[yellow3][bold]\nWarning: Nearing exit instability region.")
+else: print(f"Predicted Exit pressure: \t {P_exit:.0f} Pa")
 
-plt.plot(wall_x, wall_y, color = 'blue')
-plt.plot(wall_x, wall_y_mirrored, color = 'blue')
-plt.title("Nozzle Wall Contour")
-plt.xlabel("x (mm)")
-plt.ylabel("y (mm)")
-plt.axis('equal')
-plt.grid(True)
+
+#plt.plot(wall_x, wall_y, color = 'blue')
+#plt.plot(wall_x, wall_y_mirrored, color = 'blue')
+
+ax.plot(wall_x, wall_y, color = '#1E90FF', linewidth=2, label='Nozzle Wall Contour (MoC)')
+ax.plot(wall_x, wall_y_mirrored, color = '#1E90FF', linewidth=2)
+
+ax.set_title("Nozzle Wall Contour and Characteristics", color='white', fontsize=16)
+ax.set_xlabel("x (mm)", color='white')
+ax.set_ylabel("y (mm)", color='white')
+ax.axis('equal')
+ax.grid(True, linestyle='--', alpha=0.3)
+ax.legend(loc='lower right', frameon=True, facecolor='black', edgecolor='white', labelcolor='white')
+
+ax.tick_params(axis='x', colors='white')
+ax.tick_params(axis='y', colors='white')
+for spine in ax.spines.values(): spine.set_color('white')
+ax.legend(loc='lower right', frameon=True, facecolor=CUSTOM_GRAY_AXES, edgecolor='white', labelcolor='white')
+
+# plt.title("Nozzle Wall Contour")
+# plt.xlabel("x (mm)")
+# plt.ylabel("y (mm)")
+# plt.axis('equal')
+# plt.grid(True)
 plt.show()
