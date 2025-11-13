@@ -29,8 +29,8 @@ D_combustion = Param.D_combustion #mm
 SP = Param.Shorten_Percentage
 
 fig, ax = plt.subplots(figsize=(12, 6))
-CUSTOM_GRAY_FIG = '#1C1C1C'
-CUSTOM_GRAY_AXES = '#2E2E2E'
+CUSTOM_GRAY_FIG = "#161619"
+CUSTOM_GRAY_AXES = "#2C2B30"
 fig.set_facecolor(CUSTOM_GRAY_FIG) 
 ax.set_facecolor(CUSTOM_GRAY_AXES) 
 
@@ -228,7 +228,7 @@ y_min = np.min(y_arc)
 wall_x = np.append(x_arc, wall_x)
 wall_y = np.append(y_arc, wall_y)
 
-wall_x, wall_y = CC.CombustionChamber(wall_x, wall_y, x_arc, y_arc)
+wall_x, wall_y = CC.CombustionChamber(wall_x, wall_y, x_arc, y_arc, 10)
 
 wall_y_mirrored = -wall_y
 #plt.plot(x_arc, y_arc, color = 'blue')

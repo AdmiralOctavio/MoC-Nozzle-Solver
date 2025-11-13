@@ -1,7 +1,7 @@
 L_combustion = 100 #mm
 D_combustion = 50 #mm
 
-M_exit = 2
+M_exit = 2.1
 g = 1.22
 P_combustion = 3.3 * 10 ** 5 #Pascal
 T_combustion = 2700 #Kelvin

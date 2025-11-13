@@ -4,7 +4,7 @@ import Parameters as P
 Length = P.L_combustion
 Diameter = P.D_combustion
 
-def CombustionChamber(wall_x, wall_y, x_arc, y_arc, R=5, n_fillet=20):
+def CombustionChamber(wall_x, wall_y, x_arc, y_arc, R, n_fillet=20):
 
     def chamber_slope(y):
         return -1 * (y - y_arc[0]) + x_arc[0]
