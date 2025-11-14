@@ -6,6 +6,7 @@ import CombustionChamber as CC
 import Parameters as Param
 from scipy.interpolate import interp1d
 from scipy.interpolate import CubicHermiteSpline
+from scipy.optimize import root_scalar
 
 M_exit = Param.M_exit
 g = Param.g
@@ -22,6 +23,8 @@ mdot = Param.mdot
 
 k_max = int(1/2 * v_e / dv + 1)
 n_max = int(1/2 * v_e / dv + 1)
+
+M_optimal = np.sqrt(((P_combustion / 101325)**((g-1)/g) - 1) * 2 / (g-1))
 
 L = Param.L #theoretical throat radius in mm
 L_combustion = Param.L_combustion #mm
@@ -197,8 +200,9 @@ def solver(Graph, Write):
 
     x_calc = grid.get_x(1, n_max-1)
 
-    calc_interp = interp1d(wall_x, wall_y, kind = 'cubic')
-    y_calc = calc_interp(x_calc)
+    #calc_interp = interp1d(wall_x, wall_y, kind = 'cubic')
+    #y_calc = calc_interp(x_calc)
+    y_calc = wall_y[-1]
 
     # Calculating the circular radius near the throat, because I don't like how NASA just has a sharp edge + circular based 
 
@@ -252,13 +256,18 @@ def solver(Graph, Write):
     if Exit_Angle > 6: print(f"[red]Exit Angle: \t \t {Exit_Angle:.2f} Degrees[/red]")
     else: print(f"[cyan]Exit Angle: \t \t {Exit_Angle:.2f} Degrees[/cyan]")
     print(f"[cyan]True Throat Radius: \t {y_min:.2f} mm \n[/cyan]")
-    print(f"[light_green]Theoretical expansion ratio: \t {(wall_y[-1]**2 / L**2):.2f}")
-    print(f"[light_green]True expansion ratio: \t \t {(wall_y[-1]**2 / y_min**2):.2f}")
-    print(f"[light_green]Design Exit Mach: \t \t {M_exit}")
+
+    print(f"Optimal pressure ratio: \t {P_combustion / 101325:.2f}")
+    print(f"Optimal exit Mach: \t \t {M_optimal:.2f}")
+    print(f"Optimal expansion ratio: \t {IT.AreaRatio(g, M_optimal):.2f} \n")
+
+    print(f"[green]Theoretical expansion ratio: \t {(wall_y[-1]**2 / L**2):.2f}")
+    print(f"[light_green]True expansion ratio: \t \t {(y_calc**2 / y_min**2):.2f}")
+    print(f"[green]Design Exit Mach: \t \t {M_exit}")
     print(f"[light_green]Predicted Exit Mach: \t \t {M_exit_true:.2f}")
-    print(f"[light_green]Predicted Thrust: \t \t {Thrust:.0f} N")
-    print(f"[light_green]Thrust from Massflow: \t \t {mdot * Ve:.2f} N")
-    print(f"[light_green]Thrust from Pressure: \t \t {(P_exit - 101325) * A_exit:.2f} N[/light_green]")
+    print(f"[green]Predicted Thrust: \t \t {Thrust:.0f} N")
+    print(f"[light_green]> Thrust from Massflow: \t {mdot * Ve:.2f} N")
+    print(f"[green]> Thrust from Pressure: \t {(P_exit - 101325) * A_exit:.2f} N")
     if P_exit < 0.25 * 101325: 
         print(f"[bold][red]Predicted Exit pressure: \t {P_exit:.0f} Pa")
         print(f"[bold][red]\nWARNING: Flow separation will be present at the nozzle exit.")
@@ -268,7 +277,8 @@ def solver(Graph, Write):
     elif 0.4 * 101325 < P_exit < 0.5 * 101325: 
         print(f"[yellow3][bold]Predicted Exit pressure: \t {P_exit:.0f} Pa")
         print(f"[yellow3][bold]\nWarning: Nearing exit instability region.")
-    else: print(f"Predicted Exit pressure: \t {P_exit:.0f} Pa")
+    else: print(f"[light_green]Predicted Exit pressure: \t {P_exit:.0f} Pa")
+    print(f"[green]Specific Impulse: \t \t {Ve / 9.80665:.2f} s")
 
 
     #plt.plot(wall_x, wall_y, color = 'blue')
@@ -298,8 +308,7 @@ def solver(Graph, Write):
 
     if Write == True:
         combined = np.stack((wall_x, wall_y), axis=1)
-        filename = f"Nozzle_Contour_M={M_exit}.csv"
+        filename = f"Nozzle_Contour_M={M_exit_true}.csv"
         np.savetxt(filename, combined, delimiter=",", header = "x_position (mm), y_radius (mm)", comments = "")
 
-
-solver(Graph = True, Write = True)
+solver(True, False)
