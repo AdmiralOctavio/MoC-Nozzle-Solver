@@ -313,7 +313,7 @@ def solver(Graph, Write):
 
     if Write == True:
         combined = np.stack((wall_x, wall_y), axis=1)
-        filename = f"Nozzle_Contour_M={M_exit_true}.csv"
+        filename = f"Nozzle_Contour_M={M_exit_true:.2f}.csv"
         np.savetxt(filename, combined, delimiter=",", header = "x_position (mm), y_radius (mm)", comments = "")
 
-solver(True, False)
+solver(True, True)
