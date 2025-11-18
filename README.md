@@ -15,3 +15,4 @@ Rich
 RocketCEA
 Fortran Compiler
 numpy-stl
+ezdxf

@@ -1,5 +1,25 @@
 import numpy as np
 from stl import mesh
+import ezdxf
+
+def create_dxf(x_contour, y_contour, Mach):
+    filename = f"Nozzle_Contour_M={Mach:.2f}.dxf"
+    doc = ezdxf.new(dxfversion='R2018')
+    msp = doc.modelspace()
+
+    points = []
+    for x, y in zip(x_contour, y_contour):
+        points.append((x, y, 0))
+
+    msp.add_lwpolyline(points, 
+                       dxfattribs={
+                           'layer': 'NOZZLE_CONTOUR',
+                           'color': 256 # ByLayer color
+                       })
+    
+    # 4. Save the file
+    doc.saveas(filename)
+
 
 def create_stl(x_contour, y_contour, Mach):
     filename = f"Nozzle_Contour_M={Mach:.2f}.stl"

@@ -115,7 +115,7 @@ def coords(k, n, dv, g, grid):
     return x_kn, y_kn
 
 #basically the wall points are defined as kmax, 1 -> kmax - 1, 2, ... 2, nmax - 1.
-def solver(Graph, Write, Model):
+def solver(Graph, Write, Model, DXF):
     grid.set_xy(1, 1, -1/(slopes(1, 1, dv, g)[1]), 0.0)
 
     #for K in range(1, int(k_max) + 1):
@@ -319,5 +319,8 @@ def solver(Graph, Write, Model):
 
     if Model == True:
         stlgenerator.create_stl(wall_x, wall_y, M_exit_true)
+    
+    if DXF == True:
+        stlgenerator.create_dxf(wall_x, wall_y, M_exit_true)
 
-solver(True, False, True)
+solver(Graph = True, Write = False, Model = False, DXF = False)
