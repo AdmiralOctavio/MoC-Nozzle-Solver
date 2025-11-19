@@ -8,6 +8,7 @@ from scipy.interpolate import interp1d
 from scipy.interpolate import CubicHermiteSpline
 from scipy.optimize import root_scalar
 import stlgenerator
+import TemperatureAnalysis as TA
 
 M_exit = Param.M_exit
 g = Param.g
@@ -115,7 +116,7 @@ def coords(k, n, dv, g, grid):
     return x_kn, y_kn
 
 #basically the wall points are defined as kmax, 1 -> kmax - 1, 2, ... 2, nmax - 1.
-def solver(Graph, Write, Model, DXF):
+def solver(Graph, Write, Model, DXF, Temperature):
     grid.set_xy(1, 1, -1/(slopes(1, 1, dv, g)[1]), 0.0)
 
     #for K in range(1, int(k_max) + 1):
@@ -241,7 +242,7 @@ def solver(Graph, Write, Model, DXF):
     A_calc = (y_calc/1000)**2 * np.pi
     A_throat = (y_min/1000)**2 * np.pi
 
-    M_exit_true = IT.AreaRatioInverse(A_calc / A_throat, g)
+    M_exit_true = IT.AreaRatioInverse(A_calc / A_throat, g, 'supersonic')
     P_exit = IT.Pressure(P_combustion, g, M_exit_true)
     T_exit = IT.Temperature(T_combustion, g, M_exit_true)
     A = IT.LocalSoS(g, Rs, T_exit)
@@ -249,6 +250,8 @@ def solver(Graph, Write, Model, DXF):
     Ve = A * M_exit_true
     Thrust = mdot * Ve + (P_exit - 101325) * A_exit
     Exit_Angle = np.rad2deg(np.arctan2(wall_y[-1] - wall_y[-2], wall_x[-1] - wall_x[-2]))
+
+    Temperature_profile = TA.LocalTemperature(wall_x, wall_y)
 
     print("----------------------------------------------------")
     print(f"[bold][red]Output nozzle design specifications:[/bold][/red]")
@@ -266,7 +269,7 @@ def solver(Graph, Write, Model, DXF):
 
     print(f"[sky_blue2]Optimal pressure ratio: \t {P_combustion / 101325:.2f} \t \t |")
     print(f"[light_sky_blue3]Optimal exit Mach: \t \t {M_optimal:.2f} \t \t |")
-    print(f"[sky_blue2]Optimal expansion ratio: \t {IT.AreaRatio(g, M_optimal):.2f} \t \t |")
+    print(f"[sky_blue2]Optimal expansion ratio: \t {IT.AreaRatio(M_optimal, g):.2f} \t \t |")
 
     print("[light_green]___________________________________________________________________________________________")
 
@@ -304,6 +307,33 @@ def solver(Graph, Write, Model, DXF):
     ax.tick_params(axis='y', colors='white')
     for spine in ax.spines.values(): spine.set_color('white')
     ax.legend(loc='lower right', frameon=True, facecolor=CUSTOM_GRAY_AXES, edgecolor='white', labelcolor='white')
+    if Temperature == True:
+        f_y = interp1d(wall_x, wall_y, kind='linear', bounds_error=False, fill_value="extrapolate")
+        f_T = interp1d(wall_x, Temperature_profile, kind='linear', bounds_error=False, fill_value="extrapolate")
+
+        x_plot = np.linspace(wall_x.min(), wall_x.max(), 500)
+        y_plot_upper = f_y(x_plot)
+        T_plot = f_T(x_plot)
+
+        num_y_steps = 50 
+        
+        X_mesh, Y_mesh = np.meshgrid(x_plot, np.linspace(-1, 1, num_y_steps))
+
+        Y_mesh_scaled = Y_mesh * y_plot_upper
+        
+        Z_temp = np.tile(T_plot, (num_y_steps, 1))
+        
+        T_min = np.min(Temperature_profile) 
+        T_max = Param.T_combustion 
+
+        gradient_fill = ax.pcolormesh(X_mesh, Y_mesh_scaled, Z_temp, 
+                                    cmap='plasma', shading='auto', 
+                                    vmin=T_min, vmax=T_max)
+        
+        cbar = fig.colorbar(gradient_fill, ax=ax, orientation='vertical')
+        cbar.set_label('Local Static Temperature (K)', color='white')
+        cbar.ax.yaxis.set_tick_params(color='white')
+        plt.setp(plt.getp(cbar.ax.axes, 'yticklabels'), color='white')
 
     # plt.title("Nozzle Wall Contour")
     # plt.xlabel("x (mm)")
@@ -322,5 +352,5 @@ def solver(Graph, Write, Model, DXF):
     
     if DXF == True:
         stlgenerator.create_dxf(wall_x, wall_y, M_exit_true)
-
-solver(Graph = False, Write = False, Model = False, DXF = False)
+    #print(Temperature_profile)
+solver(Graph = True, Write = False, Model = False, DXF = False, Temperature = True)
