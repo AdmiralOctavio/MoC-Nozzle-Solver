@@ -212,6 +212,9 @@ def solver(Graph, Write, Model, DXF, Temperature):
         x_poly = np.linspace(-Radius * np.sqrt(2)/2, wall_x[0], 20)
         y_poly = chs(x_poly)
 
+        #x_poly = [0]
+        #y_poly = [L]
+
         return x_poly, y_poly
 
     x_arc, y_arc = parabolatest()

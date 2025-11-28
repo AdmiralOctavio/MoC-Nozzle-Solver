@@ -1,6 +1,6 @@
 from rocketcea.cea_obj_w_units import CEA_Obj
 
-Refinement = 1000
+Refinement = 200
 
 # Output options for the Solver
 Graph = True
@@ -18,7 +18,7 @@ configuration = obj.get_IvacCstrTc_ChmMwGam(Pc = P_combustion / 10 ** 5, MR = 5.
 L_combustion = 100 #mm
 D_combustion = 50 #mm
 
-M_exit = 2.25
+M_exit = 2.2
 g = float(configuration[4])
 T_combustion = float(configuration[2])
 ISP_cea = configuration[0]
@@ -26,10 +26,10 @@ ISP_cea = configuration[0]
 R = 8.314
 Mw = 0.0265 #kg/mol
 Rs = R / Mw
-mdot = 0.2644 #kg/s
+mdot = 0.274 #kg/s
 
 L = 5.7 #theoretical throat radius in mm
 
-Shorten_Percentage = 0.78 #1 - Percentage to truncate nozzle by, best to have this be less than 1
+Shorten_Percentage = 0.85 #1 - Percentage to truncate nozzle by, best to have this be less than 1
 Nozzle_Efficiency = 0.985 # Estimate
 Combustion_Efficiency = 0.95
