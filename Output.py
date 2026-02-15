@@ -20,6 +20,7 @@ Write = Param.Write
 Stl = Param.Stl
 Dxf = Param.Dxf
 
+# Output file. Just outputs a table with the important design parameters, along with activating the write functions if required. 
 
 import solver
 

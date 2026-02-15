@@ -5,6 +5,10 @@ import os
 folder_name = 'Output_Files'
 if not os.path.exists(folder_name): os.makedirs(folder_name)
 
+# File generator for STL and DXF file output. Turn this on if you want
+# 1) a 3D-printable cylindrical STL file
+# 2) a 2D DXF file compatible with most CAD software (verified with Fusion 360 and 3D Experience).
+
 def create_dxf(x_contour, y_contour, Mach):
     filename = f"Nozzle_Contour_M={Mach:.2f}.dxf"
     filepath = os.path.join(folder_name, filename)

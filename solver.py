@@ -22,6 +22,10 @@ from scipy.optimize import root_scalar
 import TemperatureAnalysis as TA
 import time
 
+# Main solver file for the script. Nothing in here needs to be modified by the user
+# This script contains all the sub-function definitions (such as local slopes)
+# And the main solver algorithm, along with the graphical output. 
+
 # Parameter Definition (Do not touch)
 
 Efficiency = Param.Nozzle_Efficiency * Param.Combustion_Efficiency

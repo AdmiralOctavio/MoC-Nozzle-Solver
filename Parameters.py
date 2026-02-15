@@ -15,7 +15,6 @@ Dxf = True
 Temperature = False
 Write = True
 
-
 # Engine design choices
 P_combustion = 3.4 * 10 ** 6 #Pascal
 Oxidiser_Fuel_Ratio = 5.13
@@ -29,9 +28,11 @@ ethanol100 = newFuelBlend(["Ethanol", "H2O"], [100, 0])
 obj = CEA_Obj(oxName = "N2O", fuelName = ethanol100, temperature_units = 'degK', pressure_units='bar')
 configuration = obj.get_IvacCstrTc_ChmMwGam(Pc = P_combustion / 10 ** 5, MR = Oxidiser_Fuel_Ratio, eps = 5)
 
+# Combustion Chamber dimensions
 L_combustion = 44.16 #mm
 D_combustion = 49.28 #mm
 
+# Design exit mach + other parameters
 M_exit = 2.2
 g = float(configuration[4])
 T_combustion = float(configuration[2])
@@ -42,13 +43,14 @@ Mw = configuration[3] / 1000 #kg/mol
 Rs = R / Mw
 mdot = 0.3067 #kg/s
 
-L = 12.32/2 #theoretical throat radius in mm
-Chamber_Slope = 45 
+L = 12.32/2 # Theoretical throat radius in mm
+Chamber_Slope = 45 # Please don't change this
 
 Shorten_Percentage = 0.75 #1 - Percentage to truncate nozzle by, best to have this be less than 1
-Nozzle_Efficiency = 0.985 # Estimate
-Combustion_Efficiency = 0.85
+Nozzle_Efficiency = 0.985 # Lower bound TIC estimate.
+Combustion_Efficiency = 0.85 # Also estimate.
 
+# Diagonist to ensure CEA isn't being weird.
 if diagnostic == True:
     Oxidisers = ['N2O', 'N2O', 'N2O', 'N2O']
     fuels = [ethanol80, ethanol100, ethanol80, ethanol100]
