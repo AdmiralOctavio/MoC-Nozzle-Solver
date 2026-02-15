@@ -1,0 +1,14 @@
+__pycache__/
+Output_Files/
+build/
+dist/
+*.egg-info/
+.venv/
+env/
+venv/
+.vscode/
+.idea/
+*.log
+*.csv
+*.stl
+*.dxf

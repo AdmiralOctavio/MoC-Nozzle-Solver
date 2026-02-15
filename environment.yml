@@ -1,0 +1,10 @@
+name: nozzle-env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - gfortran  # This installs the compiler into the virtual env
+  - pip
+  - pip:
+    - .
