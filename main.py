@@ -1,0 +1,3 @@
+import Output
+
+Output.outputTable()

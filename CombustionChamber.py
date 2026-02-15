@@ -8,7 +8,7 @@ L_throat = P.L
 alpha = np.deg2rad(P.Chamber_Slope)
 
 def CombustionChamber(wall_x, wall_y, R1, R2):
-    n_fillet=200
+    n_fillet=20
     wall_x = np.array(wall_x)
     wall_y = np.array(wall_y)
     wall_x = np.append(0, wall_x)
@@ -16,18 +16,18 @@ def CombustionChamber(wall_x, wall_y, R1, R2):
 
 
     # First arc immediately before the nozzle
-    x_arc1 = np.linspace(-R1 * np.sin(alpha), wall_x[0], 100)
+    x_arc1 = np.linspace(-R1 * np.sin(alpha), wall_x[0], 20)
     y_arc1 = -np.sqrt(R1**2 - x_arc1**2) + L_throat + R1
 
     wall_x = np.append(x_arc1, wall_x)
     wall_y =  np.append(y_arc1, wall_y)
 
     # Second, straight arc between nozzle and first fillet
-    x_arc2 = np.linspace(-Diameter / 2 * np.tan(alpha), x_arc1[0], 100)
+    x_arc2 = np.linspace(-Diameter / 2 * np.tan(alpha), x_arc1[0], 5)
     y_arc2 = np.linspace(Diameter / 2, y_arc1[0], 100)
 
     # Third straight arc, just combustion chamber contour
-    x_arc3 = np.linspace(-Length - x_arc2[0], x_arc2[0], 100)
+    x_arc3 = np.linspace(-Length - x_arc2[0], x_arc2[0], 20)
     y_arc3 = np.linspace(Diameter / 2, y_arc2[0], 100)
 
     

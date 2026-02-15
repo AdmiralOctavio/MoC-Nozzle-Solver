@@ -1,7 +1,9 @@
 # MoC Nozzle Solver
 Liquid Rocket Nozzle solver utilising the method of characteristics.
 
-Modify relevant parameters in Parameters.py (such as desired exit mach, theoretical throat radius, etc...)
+Modify relevant parameters in Parameters.py (such as desired exit mach, theoretical throat radius, etc...).
+
+Run main.py for tabular and graphical output. 
 
 This method is based off of NASA Technical Memorandum TM X-1502 "Computer program for design of two-dimensional supersonic nozzle with sharp-edged throat", modified for use in Python along with other modifications.
 
@@ -18,3 +20,4 @@ RocketCEA
 Fortran Compiler
 numpy-stl
 ezdxf
+os

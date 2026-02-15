@@ -1,36 +1,66 @@
 from rocketcea.cea_obj_w_units import CEA_Obj
+from rocketcea.blends import newFuelBlend
+from rich import print 
 
+
+diagnostic = False
+
+# Mesh refinement factor. Higher = better, but slower. Default = 100.
 Refinement = 100
 
 # Output options for the Solver
-Graph = False
+Graph = True
 Stl = False
-Dxf = False
+Dxf = True
 Temperature = False
-Write = False
+Write = True
+
 
 # Engine design choices
-P_combustion = 3.3 * 10 ** 6 #Pascal
+P_combustion = 3.4 * 10 ** 6 #Pascal
+Oxidiser_Fuel_Ratio = 5.13
 
-obj = CEA_Obj(oxName = "N2O", fuelName = "Ethanol", temperature_units = 'degK', pressure_units='bar')
-configuration = obj.get_IvacCstrTc_ChmMwGam(Pc = P_combustion / 10 ** 5, MR = 5.13, eps = 5)
+# Fuel Definitions
+ethanol80 = newFuelBlend(["Ethanol", "H2O"], [80, 20])
+ethanol90 = newFuelBlend(["Ethanol", "H2O"], [90, 10])
+ethanol100 = newFuelBlend(["Ethanol", "H2O"], [100, 0])
 
-L_combustion = 75 #mm
-D_combustion = 50 #mm
+# CEA Object for specific config
+obj = CEA_Obj(oxName = "N2O", fuelName = ethanol100, temperature_units = 'degK', pressure_units='bar')
+configuration = obj.get_IvacCstrTc_ChmMwGam(Pc = P_combustion / 10 ** 5, MR = Oxidiser_Fuel_Ratio, eps = 5)
 
-M_exit = 2.18
+L_combustion = 44.16 #mm
+D_combustion = 49.28 #mm
+
+M_exit = 2.2
 g = float(configuration[4])
 T_combustion = float(configuration[2])
 ISP_cea = configuration[0]
 
 R = 8.314
-Mw = 0.0265 #kg/mol
+Mw = configuration[3] / 1000 #kg/mol
 Rs = R / Mw
-mdot = 0.3065 #kg/s
+mdot = 0.3067 #kg/s
 
-L = 6.25 #theoretical throat radius in mm
+L = 12.32/2 #theoretical throat radius in mm
 Chamber_Slope = 45 
 
 Shorten_Percentage = 0.75 #1 - Percentage to truncate nozzle by, best to have this be less than 1
 Nozzle_Efficiency = 0.985 # Estimate
 Combustion_Efficiency = 0.85
+
+if diagnostic == True:
+    Oxidisers = ['N2O', 'N2O', 'N2O', 'N2O']
+    fuels = [ethanol80, ethanol100, ethanol80, ethanol100]
+    combustion_pressures = [P_combustion / (10**5),P_combustion / (10**5), P_combustion / (10**5), P_combustion / (10**5)]
+    MRs = [2, 2, 5.13, 5.13]
+    for i in range(len(Oxidisers)):
+        obj = CEA_Obj(oxName = Oxidisers[i], fuelName = fuels[i], temperature_units = 'degK', pressure_units='bar')
+        configuration = obj.get_IvacCstrTc_ChmMwGam(Pc = combustion_pressures[i], MR = MRs[i], eps = 5)
+
+
+        print("[b][blue]Inputs:")
+        print(f"[red]Oxidiser: {Oxidisers[i]}, Fuel: {fuels[i]}, Combustion Pressure: {combustion_pressures[i]:.2f} bar, Mass Ratio: {MRs[i]}")
+        print("[b][blue]Outputs:")
+        print(f"Vac ISp: {configuration[0]:.2f} s, C*: {configuration[1]:.2f} m/s, Chamber Temperature: {configuration[2]:.2f} K, Gamma: {configuration[4]:.2f}")
+        print("\n")

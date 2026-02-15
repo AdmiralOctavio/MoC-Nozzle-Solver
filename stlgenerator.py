@@ -1,9 +1,13 @@
 import numpy as np
 from stl import mesh
 import ezdxf
+import os
+folder_name = 'Output_Files'
+if not os.path.exists(folder_name): os.makedirs(folder_name)
 
 def create_dxf(x_contour, y_contour, Mach):
     filename = f"Nozzle_Contour_M={Mach:.2f}.dxf"
+    filepath = os.path.join(folder_name, filename)
     doc = ezdxf.new(dxfversion='R2018')
     msp = doc.modelspace()
 
@@ -14,15 +18,14 @@ def create_dxf(x_contour, y_contour, Mach):
     msp.add_lwpolyline(points, 
                        dxfattribs={
                            'layer': 'NOZZLE_CONTOUR',
-                           'color': 256 # ByLayer color
+                           'color': 256 # 
                        })
-    
-    # 4. Save the file
-    doc.saveas(filename)
+    doc.saveas(filepath)
 
 
 def create_stl(x_contour, y_contour, Mach):
     filename = f"Nozzle_Contour_M={Mach:.2f}.stl"
+    filepath = os.path.join(folder_name, filename)
     num_points = len(x_contour)
     num_facets = 60
     theta = np.linspace(0, 2 * np.pi, num_facets, endpoint=False) 
@@ -59,4 +62,4 @@ def create_stl(x_contour, y_contour, Mach):
 
     mesh_obj = mesh.Mesh(nozzle_mesh)
         
-    mesh_obj.save(filename)
+    mesh_obj.save(filepath)
