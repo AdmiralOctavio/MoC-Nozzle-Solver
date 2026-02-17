@@ -10,7 +10,7 @@ This method is based off of NASA Technical Memorandum TM X-1502 "Computer progra
 Due to the iterative nature of the Method of Characteristics, and physical limitations with the design, you will always notice a discrepancy between the design exit mach, and the predicted exit mach. This is to be expected, as the two are calculated in fundamentally different ways. The design exit mach is calculated at the grid point 1, n_max - 1, whereas the predicted exit mach is calculated utilising the nozzle area ratio. This does not mean that the nozzle is non-isentropic however - the nozzle is still (theoretically) fully isentropic, but for your predicted exit Mach, not your design exit Mach. 
 
 
-## This software requires the gfortran compiler, for using rocketCEA. There are two main ways to get this working quickly and smoothly.
+## This software requires the gfortran compiler for rocketCEA. There are two main ways to get this working quickly and smoothly.
 
 ### Option A (Recommended):
 1 - Install Miniconda
