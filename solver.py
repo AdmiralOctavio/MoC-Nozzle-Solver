@@ -3,7 +3,10 @@
 import IsentropicTools as IT
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import cm
+from matplotlib.colors import LightSource
 from mpl_toolkits.mplot3d import Axes3D
+import pyvista as pv
 from rich import print
 from rich.text import Text
 from rich.rule import Rule
@@ -149,7 +152,7 @@ print(n_max * k_max / 2)
 
 
 # basically the wall points are defined as kmax, 1 -> kmax - 1, 2, ... 2, nmax - 1.
-def solver(Graph2d, Graph3d):
+def solver(Graph2d, Graph3d, Graph3d_Fancy):
 
     if Graph2d: fig, ax = plt.subplots(figsize=(12, 6))
     CUSTOM_GRAY_FIG = "#161619"
@@ -288,8 +291,55 @@ def solver(Graph2d, Graph3d):
         )
         plt.show()
     
-    if Graph3d:
+    if Graph3d_Fancy:
 
+        theta = np.linspace(0, 2 * np.pi, 100)
+        theta_grid, wall_x_grid = np.meshgrid(theta, wall_x)
+        _, wall_y_grid = np.meshgrid(theta, wall_y)
+
+        X = wall_x_grid
+        Y = wall_y_grid * np.cos(theta_grid)
+        Z = wall_y_grid * np.sin(theta_grid)
+
+        points = np.column_stack([X.ravel(), Y.ravel(), Z.ravel()])
+
+        grid2 = pv.StructuredGrid()
+        grid2.points = points
+        grid2.dimensions = [theta.size, wall_x.size, 1]
+
+        grid2["Radius (mm)"] = wall_y_grid.ravel()
+
+        plotter = pv.Plotter(window_size=[1400, 800])
+        plotter.set_background("#1e1e1e") 
+
+        plotter.add_mesh(
+            grid2,
+            #scalars="Radius (mm)",
+            # cmap="copper",          # or 'plasma', 'turbo', 'coolwarm'
+            color = "#b87333",
+            opacity=0.9,
+            smooth_shading=True,     # this makes a huge difference
+            specular=0.4,            # metallic shine
+            specular_power=120,
+            ambient=0.2,
+            diffuse=0.6,
+            show_edges=False,
+            pbr=False
+        )
+
+        profile = np.column_stack([wall_x, wall_y, np.zeros_like(wall_x)])
+        profile_line = pv.Spline(profile, 300)
+        plotter.add_mesh(profile_line, color="white", line_width=2)
+
+        plotter.add_axes()
+        plotter.show_grid(color="gray")
+
+        plotter.add_title("Nozzle Geometry", font_size=14, color="white")
+
+        plotter.show()
+
+
+    if Graph3d:
         fig = plt.figure(figsize = (16,8), facecolor=CUSTOM_GRAY_FIG)
         ax = fig.add_subplot(111, projection = '3d')
 
@@ -303,17 +353,20 @@ def solver(Graph2d, Graph3d):
         X = wall_x_grid
         Y = wall_y_grid * np.cos(theta_grid)
         Z = wall_y_grid * np.sin(theta_grid)
+        norm = plt.Normalize(wall_y.min()-10, wall_y.max()+10)
+        colors = cm.magma(norm(wall_y_grid))
+        colors[..., 3] = 0.85
 
         def update_plot(high_res = True):
             ax.clear()
             ax.set_facecolor(CUSTOM_GRAY_FIG)
 
-            colour = Materials[Material]
+            # colour = Materials[Material]
 
             if high_res:
-                ax.plot_surface(X, Y, Z, color = colour, alpha = 0.7, linewidth = 0, antialiased=True, rstride = 1, cstride = 1)
+                ax.plot_surface(X, Y, Z, facecolors=colors, linewidth=0, antialiased=True, rstride=1, cstride=1)
             else:
-                ax.plot_surface(X, Y, Z, color = colour, alpha = 0.7, linewidth = 0, antialiased=False, rstride = 4, cstride = 4)
+                ax.plot_surface(X, Y, Z, facecolors = colors, linewidth = 0, antialiased=False, rstride = 8, cstride = 8)
 
         
         ax.xaxis.pane.fill = False

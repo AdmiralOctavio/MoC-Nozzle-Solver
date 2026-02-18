@@ -12,7 +12,8 @@ dependencies = [
     "rich",
     "numpy-stl",
     "rocketcea",
-    "ezdxf"
+    "ezdxf",
+    "pyvista"
 ]
 
 [tool.setuptools]

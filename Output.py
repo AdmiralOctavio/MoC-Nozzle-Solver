@@ -27,6 +27,7 @@ if not os.path.exists(folder_name):
 
 Graph2d = Param.Graph2d
 Graph3d = Param.Graph3d
+Graph3d_Fancy = Param.Graph3d_Fancy
 Write = Param.Write
 Stl = Param.Stl
 Dxf = Param.Dxf
@@ -57,7 +58,7 @@ def outputTable():
         y_calc,
         L,
         wall_y_mirrored,
-    ) = solver.solver(Graph2d, Graph3d)
+    ) = solver.solver(Graph2d, Graph3d, Graph3d_Fancy)
 
     table = Table(
         show_header=False,

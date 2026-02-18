@@ -10,7 +10,8 @@ Refinement = 100
 
 # Output options for the Solver
 Graph2d = False
-Graph3d = not Graph2d # Do not change
+Graph3d = True # Do not change
+Graph3d_Fancy = False # Fancy plotting using pyvista
 Stl = False
 Dxf = True
 Temperature = False
@@ -24,7 +25,7 @@ Materials = {
     "Titanium": "#B4B1A7",
     "Dodger Blue": "#1E90FF",
 }
-Material = "Dodger Blue"
+Material = "Copper"
 
 # Engine design choices
 P_combustion = 3.4 * 10**6  # Pascal
