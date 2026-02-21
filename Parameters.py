@@ -9,8 +9,8 @@ diagnostic = False
 Refinement = 100
 
 # Output options for the Solver
-Graph2d = False
-Graph3d = True # Do not change
+Graph2d = True
+Graph3d = False # Do not change
 Graph3d_Fancy = False # Fancy plotting using pyvista
 Stl = False
 Dxf = True
@@ -45,8 +45,8 @@ configuration = obj.get_IvacCstrTc_ChmMwGam(
 )
 
 # Combustion Chamber dimensions
-L_combustion = 44.16  # mm
-D_combustion = 49.28  # mm
+L_combustion = 93.02  # mm
+Contraction_ratio = 16
 
 # Design exit mach + other parameters
 M_exit = 2.2

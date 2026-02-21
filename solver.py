@@ -45,7 +45,6 @@ mdot = Param.mdot
 M_optimal = np.sqrt(((P_combustion / 101325) ** ((g - 1) / g) - 1) * 2 / (g - 1))
 L = Param.L
 L_combustion = Param.L_combustion
-D_combustion = Param.D_combustion
 SP = Param.Shorten_Percentage
 Graph2d = Param.Graph2d
 Graph3d = Param.Graph3d
@@ -223,7 +222,7 @@ def solver(Graph2d, Graph3d, Graph3d_Fancy):
 
     y_calc = wall_y[-1]
 
-    wall_x, wall_y = CC.CombustionChamber(wall_x, wall_y, 9.38, 47.32)
+    wall_x, wall_y = CC.CombustionChamber(wall_x, wall_y, 15, 50)
     wall_y_mirrored = -1 * wall_y
     y_min = np.min(wall_y)
 
