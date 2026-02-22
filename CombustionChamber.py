@@ -2,11 +2,10 @@ import numpy as np
 import Parameters as P
 
 Length = P.L_combustion
-L_throat = P.L
 alpha = np.deg2rad(P.Chamber_Slope)
 
 
-def CombustionChamber(wall_x, wall_y, R1, R2):
+def CombustionChamber(wall_x, wall_y, R1, R2, L_throat):
 
     Rt = L_throat 
     Contraction_Ratio = P.Contraction_ratio

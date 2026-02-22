@@ -80,3 +80,23 @@ def AreaRatioInverse(target_AR, gamma, flow_regime):
     except ValueError as e:
         print(f"Error finding root for AR={target_AR}. Check bounds. Details: {e}")
         return np.nan
+
+
+def estimate_CF(gamma, epsilon, Pc):
+
+    Me = AreaRatioInverse(epsilon, gamma, "supersonic")
+
+    Pamb = 101325
+    Pe_Pc = (1 + (gamma - 1) / 2 * Me**2) ** (-gamma / (gamma - 1))
+    Pe = Pe_Pc * Pc
+    
+    term1 = np.sqrt((2 * gamma**2) / (gamma - 1))
+    term2 = (2 / (gamma + 1)) ** ((gamma + 1) / (gamma - 1))
+    term3 = 1 - Pe_Pc ** ((gamma - 1) / gamma)
+    CF_momentum = np.sqrt(term1 * term2 * term3)
+    
+    CF_pressure = epsilon * (Pe - Pamb) / Pc
+    
+    CF_total = CF_momentum + CF_pressure
+    
+    return CF_total

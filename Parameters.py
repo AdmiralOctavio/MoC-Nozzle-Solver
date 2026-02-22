@@ -47,8 +47,10 @@ L_combustion = 83.02                            # !!!
 Contraction_ratio = 16                          # !!!
 
 # Design exit mach + other parameters
-M_exit = 2.2                                    # !!!
+M_exit = 2.23                                    # !!!
+Thrust = 600                                    # !!! N
 g = float(configuration[4])
+Cstr = float(configuration[1]) * 0.3048
 T_combustion = float(configuration[2])
 ISP_cea = configuration[0]
 
@@ -56,8 +58,7 @@ R = 8.314
 Mw = configuration[3] / 1000                    # kg/mol
 Rs = R / Mw
 mdot = 0.3067                                   # !!! kg/s
-
-L = 12.32 / 2                                   # !!!  Theoretical throat radius in mm
+                                   # !!!  Theoretical throat radius in mm
 Chamber_Slope = 45                              # !!!
 R1 = 10                                         # !!!
 R2 = 50                                         # !!!
@@ -94,6 +95,6 @@ if diagnostic:
         )
         print("[b][blue]Outputs:")
         print(
-            f"Vac ISp: {configuration[0]:.2f} s, C*: {configuration[1]:.2f} m/s, Chamber Temperature: {configuration[2]:.2f} K, Gamma: {configuration[4]:.2f}"
+            f"Vac ISp: {configuration[0]:.2f} s, C*: {configuration[1]*0.3048:.2f} m/s, Chamber Temperature: {configuration[2]:.2f} K, Gamma: {configuration[4]:.2f}"
         )
         print("\n")

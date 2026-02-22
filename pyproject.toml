@@ -17,7 +17,7 @@ dependencies = [
 ]
 
 [tool.setuptools]
-py-modules = ["main", "CombustionChamber", "IsentropicTools", "Parameters", "stlgenerator", "TemperatureAnalysis", "solver", "Output"]
+py-modules = ["main", "CombustionChamber", "IsentropicTools", "Parameters", "stlgenerator", "TemperatureAnalysis", "solver", "Output", "solver_iteration"]
 
 [tool.setuptools.packages.find]
 where = ["."]

@@ -36,7 +36,7 @@ Dxf = Param.Dxf
 
 
 
-def outputTable():
+def outputTable(R, mdot):
     console = Console()
     (
         wall_x,
@@ -58,7 +58,8 @@ def outputTable():
         y_calc,
         L,
         wall_y_mirrored,
-    ) = solver.solver(Graph2d, Graph3d, Graph3d_Fancy)
+        mdot
+    ) = solver.solver(Graph2d, Graph3d, Graph3d_Fancy, R, mdot)
 
     table = Table(
         show_header=False,
@@ -195,6 +196,10 @@ def outputTable():
         " ",
         "[light_green]CEA ISp:",
         f"[light_green]{ISP_cea:.2f} s",
+    )
+    table.add_row(
+        "[green_yellow]Mass flow-rate:",
+        f"[green_yellow]{mdot:.3f} kg/s"
     )
 
     panel = Panel(

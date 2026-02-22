@@ -2,29 +2,13 @@
 
 import IsentropicTools as IT
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import cm
-from matplotlib.colors import LightSource
-from mpl_toolkits.mplot3d import Axes3D
-import pyvista as pv
-from rich import print
-from rich.text import Text
-from rich.rule import Rule
 import CombustionChamber as CC
 import Parameters as Param
 import time
 
-
-def m(s):
-    return Text.from_markup(s)
-
-
-def divider(color):
-    return [Rule(style=color)]
-
-# Main solver file for the script. Nothing in here needs to be modified by the user
+# Iterative solver file for the script. Nothing in here needs to be modified by the user
 # This script contains all the sub-function definitions (such as local slopes)
-# And the main solver algorithm, along with the graphical output.
+# And the iterative solver algorithm.
 
 # Parameter Definition (Do not touch)
 
@@ -41,17 +25,13 @@ T_combustion = Param.T_combustion
 R = Param.R
 Mw = Param.Mw
 Rs = Param.Rs
-mdot = Param.mdot
 M_optimal = np.sqrt(((P_combustion / 101325) ** ((g - 1) / g) - 1) * 2 / (g - 1))
 L_combustion = Param.L_combustion
 SP = Param.Shorten_Percentage
-Graph2d = Param.Graph2d
-Graph3d = Param.Graph3d
-Materials = Param.Materials
-Material = Param.Material
 R1 = Param.R1
 R2 = Param.R2
-
+Cstr = Param.Cstr
+Thrust_target = Param.Thrust
 
 class GridField:
     def __init__(self, k_max, n_max):
@@ -152,12 +132,9 @@ print(n_max * k_max / 2)
 
 
 # basically the wall points are defined as kmax, 1 -> kmax - 1, 2, ... 2, nmax - 1.
-def solver(Graph2d, Graph3d, Graph3d_Fancy, L, mdot):
+def solver(mdot, L):
 
-    if Graph2d: fig, ax = plt.subplots(figsize=(12, 6))
-    CUSTOM_GRAY_FIG = "#161619"
-    CUSTOM_GRAY_AXES = "#2C2B30"
-    
+
 
     grid.set_xy(1, 1, -L / (slopes(1, 1, dv, g)[1]), 0.0)
     progress = 0
@@ -198,8 +175,6 @@ def solver(Graph2d, Graph3d, Graph3d_Fancy, L, mdot):
                 wall_x.append(x_NN)
                 wall_y.append(y_NN)
 
-        if Graph2d: ax.plot(x_line, y_line, color="#D02E2E", linestyle="--", alpha=0.5)
-
     split_index = int(len(wall_x) * SP)
     wall_x = wall_x[:split_index]
     wall_y = wall_y[:split_index]
@@ -214,20 +189,16 @@ def solver(Graph2d, Graph3d, Graph3d_Fancy, L, mdot):
             x_kn, y_kn = grid.get_xy(KI, NI)
             x_line.append(x_kn)
             y_line.append(y_kn)
-        if 0 < GridField.get_x(grid, int(k_max) - NI, NI) < wall_x[-1]:
-            if Graph2d: ax.plot(x_line, y_line, color="#AA5CF8", linestyle="--", alpha=0.5)
-        elif GridField.get_x(grid, int(k_max) - NI, NI) >= wall_x[-1]:
-            if Graph2d: ax.plot(x_line, y_line, color="#68F100", linestyle="--", alpha=0.5)
+        if GridField.get_x(grid, int(k_max) - NI, NI) >= wall_x[-1]:
             ks.append(int(k_max) - NI + 1)
             ns.append(NI)
 
     y_calc = wall_y[-1]
 
     wall_x, wall_y = CC.CombustionChamber(wall_x, wall_y, R1, R2, L)
-    wall_y_mirrored = -1 * wall_y
+
     y_min = np.min(wall_y)
 
-    wall_y_mirrored = -wall_y
 
     A_calc = (y_calc / 1000) ** 2 * np.pi
     A_throat = (y_min / 1000) ** 2 * np.pi
@@ -246,165 +217,18 @@ def solver(Graph2d, Graph3d, Graph3d_Fancy, L, mdot):
 
     Ve = A * M_exit_characteristic
     Thrust = (mdot * Ve + (P_exit - 101325) * A_exit) * Efficiency
-    Exit_Angle = np.rad2deg(
-        np.arctan2(wall_y[-1] - wall_y[-2], wall_x[-1] - wall_x[-2])
-    )
 
     time1 = time.time()
 
     print(f"\nComputation Time: {time1 - time0:.2f} seconds\n")
 
-    # Plotting
-    if Graph2d:
+    C_F = Thrust / (P_combustion * A_throat)
+    A_throat_new = (Thrust_target) / (C_F * P_combustion)
 
-        fig.set_facecolor(CUSTOM_GRAY_FIG)
-        ax.set_facecolor(CUSTOM_GRAY_AXES)
-
-        ax.plot(
-            wall_x, wall_y, color="#1E90FF", linewidth=2, label="Nozzle Wall Contour (MoC)"
-        )
-        ax.plot(wall_x, wall_y_mirrored, color="#1E90FF", linewidth=2)
-
-        ax.set_title("Nozzle Wall Contour and Characteristics", color="white", fontsize=16)
-        ax.set_xlabel("x (mm)", color="white")
-        ax.set_ylabel("y (mm)", color="white")
-        ax.axis("equal")
-        ax.grid(True, linestyle="--", alpha=0.3)
-        ax.legend(
-            loc="lower right",
-            frameon=True,
-            facecolor="black",
-            edgecolor="white",
-            labelcolor="white",
-        )
-
-        ax.tick_params(axis="x", colors="white")
-        ax.tick_params(axis="y", colors="white")
-        for spine in ax.spines.values():
-            spine.set_color("white")
-        ax.legend(
-            loc="lower right",
-            frameon=True,
-            facecolor=CUSTOM_GRAY_AXES,
-            edgecolor="white",
-            labelcolor="white",
-        )
-        plt.show()
-    
-    if Graph3d_Fancy:
-
-        theta = np.linspace(0, 2 * np.pi, 100)
-        theta_grid, wall_x_grid = np.meshgrid(theta, wall_x)
-        _, wall_y_grid = np.meshgrid(theta, wall_y)
-
-        X = wall_x_grid
-        Y = wall_y_grid * np.cos(theta_grid)
-        Z = wall_y_grid * np.sin(theta_grid)
-
-        points = np.column_stack([X.ravel(), Y.ravel(), Z.ravel()])
-
-        grid2 = pv.StructuredGrid()
-        grid2.points = points
-        grid2.dimensions = [theta.size, wall_x.size, 1]
-
-        grid2["Radius (mm)"] = wall_y_grid.ravel()
-
-        plotter = pv.Plotter(window_size=[1400, 800])
-        plotter.set_background("#1e1e1e") 
-
-        plotter.add_mesh(
-            grid2,
-            #scalars="Radius (mm)",
-            # cmap="copper",          # or 'plasma', 'turbo', 'coolwarm'
-            color = "#b87333",
-            opacity=0.9,
-            smooth_shading=True,     # this makes a huge difference
-            specular=0.4,            # metallic shine
-            specular_power=120,
-            ambient=0.2,
-            diffuse=0.6,
-            show_edges=False,
-            pbr=False
-        )
-
-        profile = np.column_stack([wall_x, wall_y, np.zeros_like(wall_x)])
-        profile_line = pv.Spline(profile, 300)
-        plotter.add_mesh(profile_line, color="white", line_width=2)
-
-        plotter.add_axes()
-        plotter.show_grid(color="gray")
-
-        plotter.add_title("Nozzle Geometry", font_size=14, color="white")
-
-        plotter.show()
-
-
-    if Graph3d:
-        fig = plt.figure(figsize = (16,8), facecolor=CUSTOM_GRAY_FIG)
-        ax = fig.add_subplot(111, projection = '3d')
-
-        fig.set_facecolor(CUSTOM_GRAY_FIG)
-        ax.set_facecolor(CUSTOM_GRAY_AXES)
-
-        theta = np.linspace(0, 2*np.pi, 100)
-        theta_grid, wall_x_grid = np.meshgrid(theta, wall_x)
-        _, wall_y_grid = np.meshgrid(theta, wall_y)
-
-        X = wall_x_grid
-        Y = wall_y_grid * np.cos(theta_grid)
-        Z = wall_y_grid * np.sin(theta_grid)
-        norm = plt.Normalize(wall_y.min()-10, wall_y.max()+10)
-        colors = cm.magma(norm(wall_y_grid))
-        colors[..., 3] = 0.85
-
-        def update_plot(high_res = True):
-            ax.clear()
-            ax.set_facecolor(CUSTOM_GRAY_FIG)
-
-            # colour = Materials[Material]
-
-            if high_res:
-                ax.plot_surface(X, Y, Z, facecolors=colors, linewidth=0, antialiased=True, rstride=1, cstride=1)
-            else:
-                ax.plot_surface(X, Y, Z, facecolors = colors, linewidth = 0, antialiased=False, rstride = 8, cstride = 8)
-
-        
-        ax.xaxis.pane.fill = False
-        ax.yaxis.pane.fill = False
-        ax.zaxis.pane.fill = False
-
-        ax.set_xlabel('x (mm)', color='white')
-        ax.set_ylabel('y (mm)', color='white')
-        ax.set_zlabel('z (mm)', color='white')
-        ax.tick_params(colors='white')
-
-        x_range = wall_x.max() - wall_x.min()
-        y_range = Y.max() - Y.min()
-        z_range = Z.max() - Z.min()
-
-        plt.subplots_adjust(left=0, right=1, bottom=0, top=1)
-
-        ax.set_xlim(wall_x.min(), wall_x.max())
-        ax.set_ylim(Y.min(), Y.max())
-        ax.set_zlim(Z.min(), Z.max())
-
-        ax.set_box_aspect((x_range, y_range, z_range))
-
-        def on_click(event):
-            if event.inaxes == ax:
-                update_plot(high_res=False)
-        def on_release(event):
-            update_plot(high_res=True)
-
-        fig.canvas.mpl_connect('button_press_event', on_click)
-        fig.canvas.mpl_connect('button_release_event', on_release)
-
-        update_plot(high_res=True)
-
-        plt.show()
+    mdot_new = P_combustion * A_throat_new / Cstr
 
     print("\n" + "="*60)
-    print("FINAL CALCULATION CHECK | SOLVER.PY")
+    print("FINAL CALCULATION CHECK | SOLVER_ITERATION.PY")
     print("="*60)
     print(f"Input L (throat radius): {L:.4f} mm")
     print(f"Input mdot: {mdot:.6f} kg/s")
@@ -421,27 +245,7 @@ def solver(Graph2d, Graph3d, Graph3d_Fancy, L, mdot):
     print(f"Thrust (before eff): {(mdot * Ve + (P_exit - 101325) * A_exit):.2f} N")
     print(f"Efficiency: {Efficiency:.4f}")
     print(f"Thrust (after eff): {Thrust:.2f} N")
+    print(f"C_F: {C_F:.4f}")
     print("="*60 + "\n")
 
-    return (
-        wall_x,
-        Exit_Angle,
-        y_min,
-        Param.T_combustion,
-        Param.g,
-        P_combustion,
-        M_optimal,
-        IT.AreaRatio(M_optimal, g),
-        wall_y,
-        M_exit,
-        M_exit_characteristic,
-        Thrust,
-        A_exit,
-        P_exit,
-        Ve,
-        Param.ISP_cea,
-        y_calc,
-        L,
-        wall_y_mirrored,
-        mdot
-    )
+    return C_F, Thrust, mdot_new, P_exit
