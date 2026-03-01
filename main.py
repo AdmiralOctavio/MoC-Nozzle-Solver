@@ -11,7 +11,7 @@ from scipy.optimize import fsolve
 #                                                                                #
 # Creator:  Flavio Cicero                                                        #
 # Date:     28/02/2026                                                           #
-# Version:  1.0                                                                  #
+# Version:  1.1                                                                  #
 #                                                                                #
 ##################################################################################
 
@@ -24,7 +24,7 @@ def run(gui_mode=False):
         mdot_val = float(mdot_guess)
         mach_val = float(mach_guess)
         
-        A_t = (mdot_val * P.Cstr) / P.P_combustion
+        A_t = (mdot_val * P.Cstr * P.Combustion_Efficiency) / P.P_combustion
         r_t = np.sqrt(A_t / np.pi) * 1000 
         
         # SI.main returns (Cf, thrust_new, mdot_out, P_exit)
@@ -45,7 +45,7 @@ def run(gui_mode=False):
     solution = fsolve(engine_residuals, x0=initial_guess)
     mdot_final, mach_final = solution
 
-    A_t_final = (mdot_final * P.Cstr) / P.P_combustion
+    A_t_final = (mdot_final * P.Cstr * P.Combustion_Efficiency) / P.P_combustion
     radius_throat_final = np.sqrt(A_t_final / np.pi) * 1000  
 
     if gui_mode:

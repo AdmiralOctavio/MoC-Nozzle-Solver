@@ -7,7 +7,8 @@ import engine.Parameters as Param
 import numpy as np
 import utils.stlgenerator as stlgenerator
 import os
-import engine.solver as solver
+import engine.solver_lcars as solver_lcars
+import engine.solver_crt as solver_crt
 
 
 def m(s):
@@ -34,31 +35,59 @@ Output file. Just outputs a table with the important design parameters, along wi
 
 '''
 
-def outputTable(R, mdot, mach):
+def outputTable(R, mdot, mach, theme):
     console = Console()
-    (
-        wall_x,
-        Exit_Angle,
-        y_min,
-        T_combustion,
-        g,
-        P_combustion,
-        M_optimal,
-        AreaRatio,
-        wall_y,
-        M_exit,
-        M_exit_characteristic,
-        Thrust,
-        A_exit,
-        P_exit,
-        Ve,
-        ISP_cea,
-        y_calc,
-        L,
-        wall_y_mirrored,
-        mdot,
-        fig,
-    ) = solver.main(mdot, R, mach)
+
+    if theme == 'lcars':
+
+        (
+            wall_x,
+            Exit_Angle,
+            y_min,
+            T_combustion,
+            g,
+            P_combustion,
+            M_optimal,
+            AreaRatio,
+            wall_y,
+            M_exit,
+            M_exit_characteristic,
+            Thrust,
+            A_exit,
+            P_exit,
+            Ve,
+            ISP_cea,
+            y_calc,
+            L,
+            wall_y_mirrored,
+            mdot,
+            fig,
+        ) = solver_lcars.main(mdot, R, mach)
+    else: 
+        (
+            wall_x,
+            Exit_Angle,
+            y_min,
+            T_combustion,
+            g,
+            P_combustion,
+            M_optimal,
+            AreaRatio,
+            wall_y,
+            M_exit,
+            M_exit_characteristic,
+            Thrust,
+            A_exit,
+            P_exit,
+            Ve,
+            ISP_cea,
+            y_calc,
+            L,
+            wall_y_mirrored,
+            mdot,
+            fig,
+        ) = solver_crt.main(mdot, R, mach)
+        
 
     table = Table(
         show_header=False,
