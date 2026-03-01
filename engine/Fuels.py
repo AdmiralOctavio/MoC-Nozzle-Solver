@@ -100,24 +100,25 @@ LOX_LH2 = PropellantConfig(
 )
 
 LOX_Ethanol100 = PropellantConfig(
-    name="LOX / Ethanol (100%)",
-    reac_names=[b"C2H5OH", b"O2(L)"],
-    fuel_weights=np.array([1.0, 0.0, 0.0]),
-    oxidant_weights=np.array([0.0, 0.0, 1.0]),
-    T_reactant=np.array([298.15, 90.15]),
-    ox_name="LOX",
-    fuel_name=_ethanol100,
+    name        = "LOX / Ethanol (100%)",
+    reac_names  = [b"C2H5OH(L)", b"O2(L)"],
+    fuel_weights    = np.array([1.0, 0.0]),   
+    oxidant_weights = np.array([0.0, 1.0]),   
+    T_reactant  = np.array([298.15, 90.15]),  
+    ox_name     = "LOX",
+    fuel_name   = _ethanol100,
 )
 
 LOX_Ethanol80 = PropellantConfig(
-    name="LOX / Ethanol (80%)",
-    reac_names=[b"C2H5OH", b"O2(L)"],
-    fuel_weights=np.array([0.8, 0.2, 0.0]),
-    oxidant_weights=np.array([0.0, 0.0, 1.0]),
-    T_reactant=np.array([298.15, 90.15]),
-    ox_name="LOX",
-    fuel_name=_ethanol80,
+    name        = "LOX / Ethanol (80%)",
+    reac_names  = [b"C2H5OH(L)", b"H2O(L)", b"O2(L)"],  
+    fuel_weights    = np.array([0.8, 0.2, 0.0]),   
+    oxidant_weights = np.array([0.0, 0.0, 1.0]),    
+    T_reactant  = np.array([298.15, 298.15, 90.15]),
+    ox_name     = "LOX",
+    fuel_name   = _ethanol80,
 )
+
 
 PROPELLANTS: dict[str, PropellantConfig] = {
     "n2o_ethanol100": N2O_Ethanol100,
