@@ -66,7 +66,7 @@ def update_engine_data(pc_pa, of_ratio):
 
     # Solve CEA
     solver.solve(
-        solution, weights, pc_bar, 33.55, subar=[16], supar=[55], hc=hc, iac=True
+        solution, weights, pc_bar, pc_pa/Ambient_P, subar=[16], supar=[5.5], hc=hc, iac=True
     )
 
     T_combustion = solution.T[0]
