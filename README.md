@@ -5,7 +5,7 @@ Modify relevant parameters in Parameters.py (such as desired exit mach, theoreti
 
 Run run-nozzle to get the locally hosted webpage interface. 
 
-This method is based off of NASA Technical Memorandum TM X-1502 "Computer program for design of two-dimensional supersonic nozzle with sharp-edged throat", modified for use in Python along with other modifications.
+This method is based off of NASA Technical Memorandum TM X-1502 "Computer program for design of two-dimensional supersonic nozzle with sharp-edged throat", modified for use in Python along with other modifications. (https://ntrs.nasa.gov/citations/19680005278)
 
 
 ## This software requires the gfortran compiler for rocketCEA. There are two main ways to get this working quickly and smoothly.
